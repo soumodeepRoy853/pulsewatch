@@ -31,7 +31,11 @@ const envSchema = z.object({
 
   DATABASE_URL: z
     .string()
-    .url()
+    .url(),
+
+  JWT_SECRET: z
+    .string()
+    .min(32)  
 });
 
 const result = envSchema.safeParse(process.env);
