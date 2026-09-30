@@ -35,7 +35,15 @@ const envSchema = z.object({
 
   JWT_SECRET: z
     .string()
-    .min(32)  
+    .min(32),
+
+  REDIS_HOST: z.string().default("127.0.0.1"),
+  REDIS_PORT: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(65535)
+    .default(6379),
 });
 
 const result = envSchema.safeParse(process.env);

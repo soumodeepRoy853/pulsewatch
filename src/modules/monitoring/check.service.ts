@@ -4,6 +4,7 @@ import { db } from "../../db/client.js";
 
 import { monitors } from "../../db/schema/monitors.js";
 import { monitorChecks } from "../../db/schema/monitor_checks.js";
+import { validateMonitorUrl } from "./url-security.js";
 
 import { checkHttpEndpoint } from "./http-checker.js";
 
@@ -22,8 +23,10 @@ export async function executeMonitorCheck(monitorId: string) {
     return null;
   }
 
+  const validatedUrl = await validateMonitorUrl(monitor.url);
+
   const result = await checkHttpEndpoint(
-    monitor.url,
+    validatedUrl.toString(),
     monitor.method as "GET" | "HEAD",
     monitor.timeoutMs,
     monitor.expectedStatus,
@@ -33,15 +36,10 @@ export async function executeMonitorCheck(monitorId: string) {
     .insert(monitorChecks)
     .values({
       monitorId: monitor.id,
-
       status: result.status,
-
       statusCode: result.statusCode,
-
       responseTimeMs: result.responseTimeMs,
-
       errorType: result.errorType,
-
       errorMessage: result.errorMessage,
     })
     .returning();

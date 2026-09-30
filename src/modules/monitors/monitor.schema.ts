@@ -46,6 +46,8 @@ export const createMonitorSchema = z.object({
   failureThreshold: z.number().int().min(1).max(10).default(3),
 
   recoveryThreshold: z.number().int().min(1).max(10).default(2),
+
+  enabled: z.boolean().default(true),
 });
 
 export const updateMonitorSchema = createMonitorSchema.partial();
