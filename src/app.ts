@@ -9,6 +9,7 @@ import { AppError } from "./lib/app-error.js";
 
 import { healthRoutes } from "./routes/health.route.js";
 import { authRoutes } from "./modules/auth/auth.route.js";
+import { monitorRoutes } from "./modules/monitors/monitor.route.js";
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({
@@ -91,6 +92,10 @@ export async function buildApp(): Promise<FastifyInstance> {
 
   await app.register(authRoutes, {
     prefix: "/api/v1/auth"
+  });
+
+  await app.register(monitorRoutes, {
+    prefix: "/api/v1/monitors"
   });
 
   return app;
