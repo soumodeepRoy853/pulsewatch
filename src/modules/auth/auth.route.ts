@@ -1,6 +1,10 @@
 import type { FastifyInstance, FastifyPluginOptions } from "fastify";
+
 import { loginSchema, registerSchema } from "./auth.schema.js";
 import { loginUser, registerUser } from "./auth.service.js";
+import { authenticate } from "./auth.middleware.js";
+import { requirePermission } from "./authorization.js";
+
 import { AppError } from "../../lib/app-error.js";
 
 export async function authRoutes(
@@ -124,4 +128,42 @@ export async function authRoutes(
       });
     }
   });
+
+  //Protected route
+  app.get(
+    "/me",
+    {
+      preHandler: authenticate,
+    },
+    async (request, reply) => {
+      return reply.status(200).send({
+        data: {
+          userId: request.user.sub,
+          organizationId: request.user.organizationId,
+          roleId: request.user.roleId,
+          role: request.user.role,
+        },
+      });
+    },
+  );
+
+  //RBAC route
+  app.get(
+  "/admin-test",
+  {
+    preHandler: [
+      authenticate,
+      requirePermission("team:manage")
+    ]
+  },
+  async (_request, reply) => {
+    return reply.status(200).send({
+      data: {
+        message:
+          "You have team management permission"
+      }
+    });
+  }
+);
+
 }
