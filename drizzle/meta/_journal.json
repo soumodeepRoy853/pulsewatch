@@ -22,6 +22,13 @@
       "when": 1790759556773,
       "tag": "0002_moaning_pestilence",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790795575461,
+      "tag": "0003_worthless_madame_web",
+      "breakpoints": true
     }
   ]
 }
