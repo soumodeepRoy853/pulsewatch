@@ -29,6 +29,27 @@
       "when": 1790795575461,
       "tag": "0003_worthless_madame_web",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790840113193,
+      "tag": "0004_demonic_franklin_richards",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790847189464,
+      "tag": "0005_melodic_menace",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790853561388,
+      "tag": "0006_concerned_silver_sable",
+      "breakpoints": true
     }
   ]
 }

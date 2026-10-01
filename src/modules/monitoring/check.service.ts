@@ -1,12 +1,11 @@
 import { eq } from "drizzle-orm";
 
 import { db } from "../../db/client.js";
-
 import { monitors } from "../../db/schema/monitors.js";
 import { monitorChecks } from "../../db/schema/monitor_checks.js";
 import { validateMonitorUrl } from "./url-security.js";
-
 import { checkHttpEndpoint } from "./http-checker.js";
+import { processCheckResult } from "./reliability.service.js";
 
 export async function executeMonitorCheck(monitorId: string) {
   const [monitor] = await db
@@ -44,5 +43,19 @@ export async function executeMonitorCheck(monitorId: string) {
     })
     .returning();
 
-  return check;
+  if (!check) {
+    throw new Error("MONITOR_CHECK_CREATE_FAILED");
+  }
+
+  const reliability = await processCheckResult({
+    organizationId: monitor.organizationId,
+    monitorId: monitor.id,
+    outcome: result.status,
+    errorMessage: result.errorMessage,
+  });
+
+  return {
+    check,
+    reliability,
+  };
 }

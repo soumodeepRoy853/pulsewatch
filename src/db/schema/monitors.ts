@@ -47,6 +47,10 @@ export const monitors = pgTable(
 
     recoveryThreshold: integer("recovery_threshold").notNull().default(2),
 
+    consecutiveFailures: integer("consecutive_failures").notNull().default(0),
+
+    consecutiveSuccesses: integer("consecutive_successes").notNull().default(0),
+
     status: varchar("status", {
       length: 20,
     })

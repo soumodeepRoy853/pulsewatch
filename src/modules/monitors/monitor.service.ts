@@ -17,7 +17,6 @@ export async function createMonitor(organizationId: string, input: CreateMonitor
     .insert(monitors)
     .values({
       organizationId,
-
       name: input.name,
       url: input.url,
       method: input.method,
@@ -27,6 +26,7 @@ export async function createMonitor(organizationId: string, input: CreateMonitor
       latencyThresholdMs: input.latencyThresholdMs,
       failureThreshold: input.failureThreshold,
       recoveryThreshold: input.recoveryThreshold,
+      enabled: input.enabled
     })
     .returning();
 
@@ -37,10 +37,12 @@ export async function createMonitor(organizationId: string, input: CreateMonitor
       500,
     );
   }
-  await scheduleMonitor(
-    monitor.id,
-    monitor.intervalSeconds
-  );
+  if (monitor.enabled) {
+    await scheduleMonitor(
+      monitor.id,
+      monitor.intervalSeconds,
+    );
+  }
 
   return monitor;
 }

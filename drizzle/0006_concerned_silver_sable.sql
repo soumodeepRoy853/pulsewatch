@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "incidents_one_open_per_monitor_idx" ON "incidents" USING btree ("monitor_id") WHERE "incidents"."status" = 'OPEN';
