@@ -24,6 +24,7 @@ export interface ReliabilityResult {
 }
 
 export async function processCheckResult(
+  tx: DbTransaction,
   input: ProcessCheckInput,
 ): Promise<ReliabilityResult> {
   return db.transaction(async (tx) => {

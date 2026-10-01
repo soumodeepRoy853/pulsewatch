@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 
 import { authenticate } from "../auth/auth.middleware.js";
@@ -16,7 +17,8 @@ export async function monitoringRoutes(app: FastifyInstance, _options: FastifyPl
         monitorId: string;
       };
 
-      const check = await executeMonitorCheck(monitorId);
+      const executionId = `manual:${crypto.randomUUID()}`;
+      const check = await executeMonitorCheck(monitorId, executionId);
  
       return reply.status(200).send({
         data: check,

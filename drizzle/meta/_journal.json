@@ -50,6 +50,13 @@
       "when": 1790853561388,
       "tag": "0006_concerned_silver_sable",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1790870653294,
+      "tag": "0007_volatile_dreadnoughts",
+      "breakpoints": true
     }
   ]
 }

@@ -13,7 +13,10 @@ export const monitorWorker = new Worker<MonitorCheckJob>(
   MONITOR_QUEUE_NAME,
 
   async (job: Job<MonitorCheckJob>) => {
-    await executeMonitorCheck(job.data.monitorId);
+    return await executeMonitorCheck(
+      job.data.monitorId,
+      job.id!,
+    );
   },
 
   {
@@ -28,8 +31,15 @@ export const monitorWorker = new Worker<MonitorCheckJob>(
   },
 );
 
-monitorWorker.on("completed", (job) => {
-  console.log(`Monitor check completed: ${job.id}`);
+monitorWorker.on("completed", (job, result) => {
+  console.log("Monitor check completed", {
+    jobId: job.id,
+    monitorId: job.data.monitorId,
+    status: result?.check?.status,
+    monitorStatus: result?.reliability?.currentStatus,
+    incidentCreated: result?.reliability?.incidentCreated,
+    incidentResolved: result?.reliability?.incidentResolved,
+  });
 });
 
 monitorWorker.on("failed", (job, error) => {

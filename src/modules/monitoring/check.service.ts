@@ -7,7 +7,10 @@ import { validateMonitorUrl } from "./url-security.js";
 import { checkHttpEndpoint } from "./http-checker.js";
 import { processCheckResult } from "./reliability.service.js";
 
-export async function executeMonitorCheck(monitorId: string) {
+export async function executeMonitorCheck(
+  monitorId: string,
+  executionId: string,
+) {
   const [monitor] = await db
     .select()
     .from(monitors)
@@ -31,27 +34,35 @@ export async function executeMonitorCheck(monitorId: string) {
     monitor.expectedStatus,
   );
 
-  const [check] = await db
-    .insert(monitorChecks)
-    .values({
+  const { check, reliability } = await db.transaction(async (tx) => {
+    const [check] = await tx
+      .insert(monitorChecks)
+      .values({
+        monitorId: monitor.id,
+        executionId,
+        status: result.status,
+        statusCode: result.statusCode,
+        responseTimeMs: result.responseTimeMs,
+        errorType: result.errorType,
+        errorMessage: result.errorMessage,
+      })
+      .returning();
+
+    if (!check) {
+      throw new Error("MONITOR_CHECK_CREATE_FAILED");
+    }
+
+    const reliability = await processCheckResult(tx, {
+      organizationId: monitor.organizationId,
       monitorId: monitor.id,
-      status: result.status,
-      statusCode: result.statusCode,
-      responseTimeMs: result.responseTimeMs,
-      errorType: result.errorType,
+      outcome: result.status,
       errorMessage: result.errorMessage,
-    })
-    .returning();
+    });
 
-  if (!check) {
-    throw new Error("MONITOR_CHECK_CREATE_FAILED");
-  }
-
-  const reliability = await processCheckResult({
-    organizationId: monitor.organizationId,
-    monitorId: monitor.id,
-    outcome: result.status,
-    errorMessage: result.errorMessage,
+    return {
+      check,
+      reliability,
+    };
   });
 
   return {

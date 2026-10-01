@@ -1,11 +1,12 @@
 import {
   index,
-  integer,
   pgTable,
   timestamp,
   uuid,
   varchar,
+  integer,
   text,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 import { monitors } from "./monitors.js";
@@ -17,21 +18,18 @@ export const monitorChecks = pgTable(
 
     monitorId: uuid("monitor_id")
       .notNull()
-      .references(() => monitors.id, {
-        onDelete: "cascade",
-      }),
+      .references(() => monitors.id, { onDelete: "cascade" }),
 
-    status: varchar("status", {
-      length: 20,
-    }).notNull(),
+    // BullMQ retries reuse the same executionId.
+    executionId: varchar("execution_id", { length: 255 }).notNull(),
+
+    status: varchar("status", { length: 20 }).notNull(),
 
     statusCode: integer("status_code"),
 
     responseTimeMs: integer("response_time_ms"),
 
-    errorType: varchar("error_type", {
-      length: 50,
-    }),
+    errorType: varchar("error_type", { length: 50 }),
 
     errorMessage: text("error_message"),
 
@@ -46,5 +44,9 @@ export const monitorChecks = pgTable(
       table.monitorId,
       table.checkedAt,
     ),
+
+    executionIdUniqueIdx: uniqueIndex(
+      "monitor_checks_execution_id_unique_idx",
+    ).on(table.executionId),
   }),
 );
